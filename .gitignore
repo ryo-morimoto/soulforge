@@ -60,3 +60,6 @@ benchmarks/results-*.json
 audit_issue.json
 coverage/
 test_tmp/
+
+# Nix
+result

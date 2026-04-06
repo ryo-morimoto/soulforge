@@ -2239,6 +2239,7 @@ export function useChat({
                 id: part.id,
                 toolName: part.toolName,
                 state: "running",
+                startedAt: Date.now(),
                 ...(isChildCall ? { parentId: activeCodeExec.id } : {}),
                 ...(part.toolName === "web_search" && webSearchModelLabelRef.current
                   ? { backend: webSearchModelLabelRef.current }
@@ -2815,17 +2816,41 @@ export function useChat({
             abortedToolCallsSnapshot.current.length > 0
               ? abortedToolCallsSnapshot.current
               : liveToolCallsBuffer.current;
+          const now = Date.now();
           for (const seg of finalSegments) {
             if (seg.type === "tools") {
               for (const id of seg.toolCallIds) {
                 if (!completedIds.has(id)) {
                   const live = liveBuf.find((c: LiveToolCall) => c.id === id);
                   const args = live?.args ? safeParseArgs(live.args) : {};
+                  const elapsedMs = live?.startedAt ? now - live.startedAt : 0;
+                  const elapsedSec = (elapsedMs / 1000).toFixed(1);
+                  const toolName = live?.toolName ?? "unknown";
+
+                  // Build a summary of what the tool was doing
+                  const argsSummary = live?.args
+                    ? live.args.slice(0, 500)
+                    : JSON.stringify(args).slice(0, 500);
+                  const progressNote = live?.progressText ? `\nProgress: ${live.progressText}` : "";
+
+                  const interruptOutput = [
+                    `[Interrupted by user (Ctrl+X) after ${elapsedSec}s]`,
+                    `Tool: ${toolName}`,
+                    `Args: ${argsSummary}`,
+                    progressNote,
+                  ]
+                    .filter(Boolean)
+                    .join("\n");
+
                   completedCalls.push({
                     id,
-                    name: live?.toolName ?? "unknown",
+                    name: toolName,
                     args,
-                    result: { success: false, output: "", error: "Interrupted by user (Ctrl+X)" },
+                    result: {
+                      success: false,
+                      output: interruptOutput,
+                      error: "Interrupted by user (Ctrl+X)",
+                    },
                   });
                 }
               }
@@ -2866,7 +2891,10 @@ export function useChat({
               type: "tool-result" as const,
               toolCallId: call.id,
               toolName: call.name,
-              output: { type: "text" as const, value: call.result?.output ?? "" },
+              output: {
+                type: "text" as const,
+                value: call.result?.output || call.result?.error || "",
+              },
             }));
             setCoreMessages((prev) => [
               ...prev,

@@ -35,6 +35,8 @@ export interface LiveToolCall {
   args?: string;
   result?: string;
   error?: string;
+  /** Epoch ms when the tool call started streaming. */
+  startedAt?: number;
   /** Set at tool-call start when the backend is known upfront (e.g. routed web search agent). */
   backend?: string;
   /** Parent code_execution tool call ID — set when called from code execution sandbox. */

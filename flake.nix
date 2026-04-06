@@ -67,17 +67,18 @@
           '';
 
           installPhase = ''
-            mkdir -p $out/lib/soulforge $out/bin
+            mkdir -p $out/lib/soulforge/dist $out/bin
 
             # dist output (index.js, workers, opentui-assets, init.lua)
-            cp -r dist/* $out/lib/soulforge/
+            cp -r dist/* $out/lib/soulforge/dist/
 
             # node_modules needed at runtime for native addons
-            cp -r node_modules $out/lib/soulforge/
+            cp -r node_modules $out/lib/soulforge/dist/
 
             # Wrapper: bun runs the bundled index.js with runtime deps on PATH
+            # Path must contain /dist so IS_DIST detection works at runtime
             makeWrapper ${pkgs.bun}/bin/bun $out/bin/soulforge \
-              --add-flags "$out/lib/soulforge/index.js" \
+              --add-flags "$out/lib/soulforge/dist/index.js" \
               --prefix PATH : ${lib.makeBinPath runtimeDeps}
 
             ln -s $out/bin/soulforge $out/bin/sf

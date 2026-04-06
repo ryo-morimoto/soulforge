@@ -7,6 +7,10 @@ const hasCli =
   cliArgs.includes("--headless") ||
   cliArgs.includes("--list-providers") ||
   cliArgs.includes("--list-models") ||
+  cliArgs.includes("--auth-status") ||
+  cliArgs.includes("--auth-login") ||
+  cliArgs.includes("--auth-login-device") ||
+  cliArgs.includes("--auth-logout") ||
   cliArgs.includes("--set-key") ||
   cliArgs.includes("--version") ||
   cliArgs.includes("-v") ||

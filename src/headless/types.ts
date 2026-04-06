@@ -38,5 +38,8 @@ export type HeadlessAction =
   | { type: "chat"; opts: HeadlessChatOptions }
   | { type: "list-providers" }
   | { type: "list-models"; provider?: string }
+  | { type: "auth-status"; provider?: string }
+  | { type: "auth-login"; provider: string; device: boolean }
+  | { type: "auth-logout"; provider: string }
   | { type: "set-key"; provider: string; key: string }
   | { type: "version" };

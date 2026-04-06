@@ -27,6 +27,10 @@ ${BOLD}Usage:${RST}
 ${BOLD}Management:${RST}
   soulforge --list-providers                             Show providers + status
   soulforge --list-models [provider]                     Show available models
+  soulforge --auth-status [provider]                    Show auth status
+  soulforge --auth-login <provider>                     Start provider login
+  soulforge --auth-login-device <provider>              Start device-code login
+  soulforge --auth-logout <provider>                    Remove provider OAuth session
   soulforge --set-key <provider> <key>                   Save an API key
   soulforge --version                                    Show version
 
@@ -42,6 +46,35 @@ export async function parseHeadlessArgs(argv: string[]): Promise<HeadlessAction 
     const next = argv[idx + 1];
     const provider = next && !next.startsWith("--") ? next : undefined;
     return { type: "list-models", provider };
+  }
+
+  if (argv.includes("--auth-status")) {
+    const idx = argv.indexOf("--auth-status");
+    const next = argv[idx + 1];
+    const provider = next && !next.startsWith("--") ? next : undefined;
+    return { type: "auth-status", provider };
+  }
+
+  if (argv.includes("--auth-login") || argv.includes("--auth-login-device")) {
+    const device = argv.includes("--auth-login-device");
+    const flag = device ? "--auth-login-device" : "--auth-login";
+    const idx = argv.indexOf(flag);
+    const provider = argv[idx + 1];
+    if (!provider) {
+      process.stderr.write(`${RED()}Error:${RST} ${flag} requires <provider>\n`);
+      process.exit(EXIT_ERROR);
+    }
+    return { type: "auth-login", provider, device };
+  }
+
+  if (argv.includes("--auth-logout")) {
+    const idx = argv.indexOf("--auth-logout");
+    const provider = argv[idx + 1];
+    if (!provider) {
+      process.stderr.write(`${RED()}Error:${RST} --auth-logout requires <provider>\n`);
+      process.exit(EXIT_ERROR);
+    }
+    return { type: "auth-logout", provider };
   }
 
   if (argv.includes("--set-key")) {

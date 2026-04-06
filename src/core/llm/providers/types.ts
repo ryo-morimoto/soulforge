@@ -1,4 +1,5 @@
 import type { LanguageModel } from "ai";
+import type { ProviderAuthAdapter } from "../../auth/types.js";
 
 export interface ProviderModelInfo {
   id: string;
@@ -25,6 +26,7 @@ export interface ProviderDefinition {
   contextWindows: [pattern: string, tokens: number][];
   grouped?: boolean;
   custom?: boolean;
+  auth?: ProviderAuthAdapter;
   checkAvailability?(): Promise<boolean>;
   onActivate?(): Promise<void>;
   onDeactivate?(): void;

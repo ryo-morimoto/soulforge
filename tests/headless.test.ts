@@ -38,6 +38,52 @@ describe("parseHeadlessArgs", () => {
 		expect(result).toEqual({ type: "set-key", provider: "openai", key: "sk-123" });
 	});
 
+	test("parses --auth-status without provider", async () => {
+		const result = await parseHeadlessArgs(["--auth-status"]);
+		expect(result).toEqual({ type: "auth-status", provider: undefined });
+	});
+
+	test("parses --auth-status with provider", async () => {
+		const result = await parseHeadlessArgs(["--auth-status", "openai"]);
+		expect(result).toEqual({ type: "auth-status", provider: "openai" });
+	});
+
+	test("parses --auth-login", async () => {
+		const result = await parseHeadlessArgs(["--auth-login", "openai"]);
+		expect(result).toEqual({ type: "auth-login", provider: "openai", device: false });
+	});
+
+	test("parses --auth-login-device", async () => {
+		const result = await parseHeadlessArgs(["--auth-login-device", "openai"]);
+		expect(result).toEqual({ type: "auth-login", provider: "openai", device: true });
+	});
+
+	test("parses --auth-logout", async () => {
+		const result = await parseHeadlessArgs(["--auth-logout", "openai"]);
+		expect(result).toEqual({ type: "auth-logout", provider: "openai" });
+	});
+
+	test("--auth-login without provider exits with error", async () => {
+		try {
+			await parseHeadlessArgs(["--auth-login"]);
+		} catch {}
+		expect(exitCode).toBe(1);
+	});
+
+	test("--auth-login-device without provider exits with error", async () => {
+		try {
+			await parseHeadlessArgs(["--auth-login-device"]);
+		} catch {}
+		expect(exitCode).toBe(1);
+	});
+
+	test("--auth-logout without provider exits with error", async () => {
+		try {
+			await parseHeadlessArgs(["--auth-logout"]);
+		} catch {}
+		expect(exitCode).toBe(1);
+	});
+
 	test("--set-key without args exits with error", async () => {
 		try {
 			await parseHeadlessArgs(["--set-key"]);

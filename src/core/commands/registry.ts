@@ -1,3 +1,4 @@
+import { matchAuthPrefix, register as registerAuth } from "./auth.js";
 import { matchClaimsPrefix, register as registerClaims } from "./claims.js";
 import { matchConfigPrefix, register as registerConfig } from "./config.js";
 import { matchContextPrefix, register as registerContext } from "./context.js";
@@ -14,6 +15,7 @@ import { sysMsg } from "./utils.js";
 const commandMap = new Map<string, CommandHandler>();
 
 registerGit(commandMap);
+registerAuth(commandMap);
 registerConfig(commandMap);
 registerSession(commandMap);
 registerContext(commandMap);
@@ -26,6 +28,7 @@ registerClaims(commandMap);
 
 const prefixMatchers = [
   matchContextPrefix,
+  matchAuthPrefix,
   matchGitPrefix,
   matchConfigPrefix,
   matchSessionPrefix,
@@ -267,6 +270,34 @@ const COMMAND_DEFS: CommandDef[] = [
   { cmd: "/git status", ic: "git", desc: "Git status", category: "Git", tags: ["info"] },
 
   // ── Models ──
+  {
+    cmd: "/auth",
+    ic: "key",
+    desc: "Provider auth status, login, logout",
+    category: "Models",
+    tags: ["oauth", "auth", "login"],
+  },
+  {
+    cmd: "/auth login",
+    ic: "key",
+    desc: "Authenticate a provider",
+    category: "Models",
+    tags: ["oauth", "login"],
+  },
+  {
+    cmd: "/auth logout",
+    ic: "key_missing",
+    desc: "Remove provider OAuth session",
+    category: "Models",
+    tags: ["oauth", "logout"],
+  },
+  {
+    cmd: "/auth status",
+    ic: "info",
+    desc: "Show provider auth status",
+    category: "Models",
+    tags: ["oauth", "status"],
+  },
   {
     cmd: "/keys",
     ic: "cog",

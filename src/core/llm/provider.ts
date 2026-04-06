@@ -1,4 +1,5 @@
 import type { LanguageModel } from "ai";
+import { getProviderAuthState } from "../auth/index.js";
 import { getProviderApiKey } from "../secrets.js";
 import { getAllProviders, getProvider } from "./providers/index.js";
 
@@ -19,7 +20,9 @@ export async function checkProviders(): Promise<ProviderStatus[]> {
   const results = await Promise.all(
     getAllProviders().map(async (p) => {
       let available: boolean;
-      if (p.checkAvailability) {
+      if (p.auth) {
+        available = (await getProviderAuthState(p)).available;
+      } else if (p.checkAvailability) {
         available = await p.checkAvailability();
       } else {
         available = p.envVar === "" ? true : Boolean(getProviderApiKey(p.envVar));

@@ -3,7 +3,14 @@ import { getProviderSecretEntries, registerCustomProviders } from "../core/llm/p
 import { registerProviderSecrets } from "../core/secrets.js";
 import type { AppConfig } from "../types/index.js";
 import { VERSION } from "./constants.js";
-import { listModels, listProviders, setKey } from "./providers.js";
+import {
+  authLogin,
+  authLogout,
+  authStatus,
+  listModels,
+  listProviders,
+  setKey,
+} from "./providers.js";
 import { runChat, runPrompt } from "./run.js";
 import type { HeadlessAction } from "./types.js";
 
@@ -41,6 +48,15 @@ export async function runHeadless(action: HeadlessAction): Promise<void> {
       break;
     case "list-models":
       await listModels(action.provider);
+      break;
+    case "auth-status":
+      await authStatus(action.provider);
+      break;
+    case "auth-login":
+      await authLogin(action.provider, action.device);
+      break;
+    case "auth-logout":
+      await authLogout(action.provider);
       break;
     case "set-key":
       setKey(action.provider, action.key);
